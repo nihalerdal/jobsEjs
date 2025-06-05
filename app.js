@@ -38,6 +38,11 @@ app.use(session(sessionParms));
 
 //flash messages
 app.use(require("connect-flash")());
+app.use(require("./middleware/storeLocals"));
+app.get("/", (req, res) => {
+  res.render("index");
+});
+app.use("/sessions", require("./routes/sessionRoutes"));
 
 
 //Routes
