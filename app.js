@@ -12,7 +12,6 @@ app.use(require("body-parser").urlencoded({ extended: true }));
 require("dotenv").config(); // to load the .env file into the process.env object
 const session = require("express-session");
 const MongoDBStore = require("connect-mongodb-session")(session);
-
 const store = new MongoDBStore({
   uri: process.env.MONGO_URI,
   collection: "mySessions",
@@ -36,7 +35,12 @@ if (app.get("env") === "production") {
 }
 
 app.use(session(sessionParms));
+const passport = require("passport");
+const passportInit = require("./passport/passportInit");
 
+passportInit();
+app.use(passport.initialize());
+app.use(passport.session());
 //flash messages
 app.use(require("connect-flash")());
 app.use(require("./middleware/storeLocals"));
