@@ -78,4 +78,5 @@ app.use((err, req, res, next) => {
 });
 
 const port = process.env.PORT || 3000;
+await require("./db/connect")(process.env.MONGO_URI);
 app.listen(port, () => console.log(`Server is listening on port ${port}...`));
