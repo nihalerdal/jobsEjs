@@ -65,7 +65,10 @@ app.use("/sessions", require("./routes/sessionRoutes"));
 const secretWordRouter = require("./routes/secretWord");
 app.use("/secretWord", secretWordRouter);
 
+const expensesRoutes = require("./routes/expenses");
 const auth = require("./middleware/auth");
+
+app.use("/expenses", auth, expensesRoutes);
 app.use("/secretWord", auth, secretWordRouter);
 
 
