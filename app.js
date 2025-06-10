@@ -2,9 +2,13 @@ const express = require("express");
 require("express-async-errors");
 const connectDB = require("./db/connect");
 
+const cookieParser = require("cookie-parser");
+const csurf = require("csurf");
+
 const app = express();
 
 app.set("view engine", "ejs");
+app.use(cookieParser(process.env.SESSION_SECRET)); 
 app.use(require("body-parser").urlencoded({ extended: true }));
 
 // let secretWord = "syzygy";
@@ -37,10 +41,17 @@ if (app.get("env") === "production") {
 app.use(session(sessionParms));
 const passport = require("passport");
 const passportInit = require("./passport/passportInit");
-
 passportInit();
+
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(csurf());  
+
+app.use((req, res, next) => {
+  res.locals.csrfToken = req.csrfToken();
+  next();
+});
+
 //flash messages
 app.use(require("connect-flash")());
 app.use(require("./middleware/storeLocals"));
