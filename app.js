@@ -1,5 +1,11 @@
 const express = require("express");
 require("express-async-errors");
+
+//extra security packages
+const helmet = require("helmet");
+const xss = require("xss-clean");
+const rateLimit = require("express-rate-limit");
+
 const connectDB = require("./db/connect");
 
 const cookieParser = require("cookie-parser");
@@ -80,6 +86,15 @@ app.use((err, req, res, next) => {
   res.status(500).send(err.message);
   console.error(err);
 });
+
+app.use(helmet());
+app.use(xss());
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+});
+app.use(limiter);
 
 const port = process.env.PORT || 3000;
 
