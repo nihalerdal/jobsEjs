@@ -1,0 +1,46 @@
+<%- include("partials/header") %>
+
+<h2>My Expenses</h2>
+
+<a href="/expenses/new"><button type="button">Add New Expense</button></a>
+
+<table>
+  <thead>
+    <tr>
+      <th>Title</th>
+      <th>Amount</th>
+      <th>Date</th>
+      <th>Main Category</th>
+      <th>Sub Category</th>
+      <th colspan="2">Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% if (expenses && expenses.length) { %>
+      <% expenses.forEach(expense => { %>
+        <tr>
+          <td><%= expense.title %></td>
+          <td><%= expense.amount %></td>
+          <td><%= expense.date.toISOString().substring(0,10) %></td>
+          <td><%= expense.mainCategory %></td>
+          <td><%= expense.subCategory %></td>
+          <td>
+            <a href="/expenses/edit/<%= expense._id %>">
+              <button type="button">Edit</button>
+            </a>
+          </td>
+          <td>
+            <form method="POST" action="/expenses/delete/<%= expense._id %>" style="display:inline;">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <button type="submit">Delete</button>
+            </form>
+          </td>
+        </tr>
+      <% }) %>
+    <% } else { %>
+      <tr><td colspan="7">No expenses found.</td></tr>
+    <% } %>
+  </tbody>
+</table>
+
+<%- include("partials/footer") %>
