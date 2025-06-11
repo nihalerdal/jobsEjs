@@ -8,7 +8,7 @@ const csurf = require("csurf");
 const app = express();
 
 app.set("view engine", "ejs");
-app.use(cookieParser(process.env.SESSION_SECRET)); 
+app.use(cookieParser());
 app.use(require("body-parser").urlencoded({ extended: true }));
 
 // let secretWord = "syzygy";

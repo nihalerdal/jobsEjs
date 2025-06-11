@@ -1,18 +1,19 @@
 const Expense = require("../models/Expense");
+// const { BadRequestError, NotFoundError } = require("../errors");
 
 const getAllExpenses = async (req, res, next) => {
   try {
     const expenses = await Expense.find({ createdBy: req.user.userId }).sort(
       "createdAt"
     );
-    res.render("expenses", { expenses });
+    res.render("expenses", { expenses, csrfToken: req.csrfToken()});
   } catch (error) {
     next(error);
   }
 };
 
 const getNewExpenseForm = (req, res) => {
-  res.render("new-expense");
+  res.render("new-expense", { csrfToken: req.csrfToken() });
 };
 
 const createExpense = async (req, res, next) => {
@@ -34,7 +35,7 @@ const getEditExpenseForm = async (req, res, next) => {
     if (!expense) {
       throw new NotFoundError("Expense not found");
     }
-    res.render("edit-expense", { expense }); 
+    res.render("edit-expense", { expense, csrfToken: req.csrfToken() });
   } catch (error) {
     next(error);
   }
