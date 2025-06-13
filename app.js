@@ -1,10 +1,20 @@
 const express = require("express");
 require("express-async-errors");
+
+//extra security packages
+const helmet = require("helmet");
+const xss = require("xss-clean");
+const rateLimit = require("express-rate-limit");
+
 const connectDB = require("./db/connect");
+
+const cookieParser = require("cookie-parser");
+const csurf = require("csurf");
 
 const app = express();
 
 app.set("view engine", "ejs");
+app.use(cookieParser());
 app.use(require("body-parser").urlencoded({ extended: true }));
 
 // let secretWord = "syzygy";
@@ -37,10 +47,17 @@ if (app.get("env") === "production") {
 app.use(session(sessionParms));
 const passport = require("passport");
 const passportInit = require("./passport/passportInit");
-
 passportInit();
+
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(csurf());  
+
+app.use((req, res, next) => {
+  res.locals.csrfToken = req.csrfToken();
+  next();
+});
+
 //flash messages
 app.use(require("connect-flash")());
 app.use(require("./middleware/storeLocals"));
@@ -54,7 +71,10 @@ app.use("/sessions", require("./routes/sessionRoutes"));
 const secretWordRouter = require("./routes/secretWord");
 app.use("/secretWord", secretWordRouter);
 
+const expensesRoutes = require("./routes/expenses");
 const auth = require("./middleware/auth");
+
+app.use("/expenses", auth, expensesRoutes);
 app.use("/secretWord", auth, secretWordRouter);
 
 
@@ -66,6 +86,15 @@ app.use((err, req, res, next) => {
   res.status(500).send(err.message);
   console.error(err);
 });
+
+app.use(helmet());
+app.use(xss());
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+});
+app.use(limiter);
 
 const port = process.env.PORT || 3000;
 
